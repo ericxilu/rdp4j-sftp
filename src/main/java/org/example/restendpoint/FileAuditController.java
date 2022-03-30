@@ -3,7 +3,7 @@ package org.example.restendpoint;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.data.FileAuditService;
-import org.example.sftp.FtpExample;
+import org.example.sftp.SftpDirectoryPuller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,13 +19,13 @@ import java.util.Map;
 public class FileAuditController {
 
     private final FileAuditService fileAuditService;
-    private final FtpExample ftpExample;
+    private final SftpDirectoryPuller sftpDirectoryPuller;
 
 
     public FileAuditController(final FileAuditService fileAuditService,
-                               final FtpExample ftpExample) {
+                               final SftpDirectoryPuller sftpDirectoryPuller) {
         this.fileAuditService = fileAuditService;
-        this.ftpExample = ftpExample;
+        this.sftpDirectoryPuller = sftpDirectoryPuller;
     }
 
     @GetMapping("/fileaudit")
@@ -45,7 +45,7 @@ public class FileAuditController {
     public ResponseEntity<String> stopFtpPuller(){
         log.info("stopping ftp puller");
         try {
-            ftpExample.stop();
+            sftpDirectoryPuller.stop();
             log.info("sftp puller stopped");
             return new ResponseEntity<>("sftp puller stopped", HttpStatus.OK);
         }finally {

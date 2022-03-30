@@ -1,9 +1,9 @@
 package org.example.sftp;
 
 import java.io.IOException;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
+import java.util.TreeSet;
 import java.util.Vector;
 
 import com.github.drapostolos.rdp4j.spi.FileElement;
@@ -15,14 +15,17 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
+import lombok.extern.slf4j.Slf4j;
 
-public class SFtpDirectory implements PolledDirectory{
+@Slf4j
+public class SftpDirectory implements PolledDirectory{
     private String host;
     private String workingDirectory;
     private String username;
     private String password;
 
-    public SFtpDirectory(String host, String workingDirectory, String username, String password) {
+    public SftpDirectory(String host, String workingDirectory, String username, String password) {
+        log.info("sftp host: {}, workingDirectory: {}, username: {}, password: {}", host, workingDirectory, username, password);
         this.host = host;
         this.workingDirectory = workingDirectory;
         this.username = username;
@@ -31,10 +34,10 @@ public class SFtpDirectory implements PolledDirectory{
 
     public Set<FileElement> listFiles() throws IOException
     {
-        Set<FileElement> result = new LinkedHashSet<FileElement>();
+        Set<FileElement> result = new TreeSet<>();
 
         JSch jsch = new JSch();
-        Session session = null;
+        Session session ;
         try {
             session = jsch.getSession( username, host, 22 );
             session.setConfig("StrictHostKeyChecking", "no");
@@ -44,11 +47,10 @@ public class SFtpDirectory implements PolledDirectory{
             Channel channel = session.openChannel("sftp");
             channel.connect();
             ChannelSftp sftpChannel = (ChannelSftp) channel;
-//            sftpChannel.get("remotefile.txt", "localfile.txt");
             Vector<LsEntry> filesList = sftpChannel.ls( workingDirectory );
             for(LsEntry file : filesList)
             {
-                result.add( new SFtpFile( file ) );
+                result.add( new SftpFile( file ) );
 
             }
             sftpChannel.exit();
@@ -61,6 +63,7 @@ public class SFtpDirectory implements PolledDirectory{
             throw new IOException(e);
         }
 
+        log.info("remote sftp server list of files {}", result);
         return result;
     }
 }

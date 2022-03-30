@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.github.drapostolos.rdp4j.DirectoryPoller;
 import com.github.drapostolos.rdp4j.spi.PolledDirectory;
+import org.example.fileservice.RemoteRefDataFileService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +15,7 @@ import javax.annotation.PostConstruct;
 
 @Component
 @Slf4j
-public class FtpExample {
+public class SftpDirectoryPuller {
     @Value("${sftp.path}")
     private String path = "ftpserver";
 
@@ -26,7 +27,16 @@ public class FtpExample {
 
     @Value("${sftp.password}")
     private String password = "1943L1944t$&@";
-    DirectoryPoller dp;
+
+    private DirectoryPoller dp;
+
+    private RemoteRefDataFileService remoteRefDataFileService;
+
+    public SftpDirectoryPuller(final RemoteRefDataFileService remoteRefDataFileService) {
+        this.remoteRefDataFileService = remoteRefDataFileService;
+    }
+
+
 
     public void stop(){
         dp.stop();
@@ -35,24 +45,19 @@ public class FtpExample {
 
 
     @PostConstruct
-    private void doMain() throws InterruptedException {
+    private void doMain()  {
 
 
-//        System.out.println("monitoring directory: " + path);
         log.info("monitoring directory: {} ",  path);
-        PolledDirectory polledDirectory = new SFtpDirectory(host, path, username, password);
+        PolledDirectory polledDirectory = new SftpDirectory(host, path, username, password);
 
          dp = DirectoryPoller.newBuilder()
                 .addPolledDirectory(polledDirectory)
-                .addListener(new MyListener())
+                .addListener(new SftpDirectoryPullerListener(remoteRefDataFileService))
                 .enableFileAddedEventsForInitialContent()
-//            .setPollingInterval(10, TimeUnit.MINUTES)
                 .setPollingInterval(10, TimeUnit.SECONDS)
                 .start();
 
-//        TimeUnit.HOURS.sleep(2);
-//
-//        dp.stop();
         }
 
 }

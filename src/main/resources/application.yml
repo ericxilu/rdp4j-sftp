@@ -1,0 +1,8 @@
+sftp:
+  host: localhost
+  path: ${SFTP_PATH:ftpserver}
+  username: ${SFTP_USERNAME:ericlu}
+  password: ${SFTP_PASSWORD:1943L1944t$&@}
+
+localRefData:
+  path  : ${LOCAL_REFDATA_PATH:/Users/ericlu/refdata}
