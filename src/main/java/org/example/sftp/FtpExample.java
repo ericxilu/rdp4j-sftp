@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.github.drapostolos.rdp4j.DirectoryPoller;
 import com.github.drapostolos.rdp4j.spi.PolledDirectory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -14,22 +15,21 @@ import javax.annotation.PostConstruct;
 @Component
 @Slf4j
 public class FtpExample {
-//    @Option(name="-path")
+    @Value("${sftp.path}")
     private String path = "ftpserver";
 
-//    @Option(name="-host")
+    @Value("${sftp.host}")
     private String host = "localhost";
 
-//    @Option(name="-username")
+    @Value("${sftp.username}")
     private String username = "ericlu";
 
-//    @Option(name="-password")
+    @Value("${sftp.password}")
     private String password = "1943L1944t$&@";
     DirectoryPoller dp;
 
     public void stop(){
         dp.stop();
-
     }
 
 
