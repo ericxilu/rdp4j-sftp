@@ -31,7 +31,7 @@ public class LocalRefDataFileService {
 
     public Set<String> getExisingRefDataFiles () throws IOException {
 
-        try (Stream<Path> stream = list(Paths.get(localRefDataPath))) {
+        try (Stream<Path> stream = list(Paths.get(localRefDataArchivePath))) {
             return stream
                     .filter(file -> !Files.isDirectory(file))
                     .map(Path::getFileName)
