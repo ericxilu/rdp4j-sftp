@@ -5,4 +5,5 @@ sftp:
   password: ${SFTP_PASSWORD:1943L1944t$&@}
 
 localRefData:
-  path  : ${LOCAL_REFDATA_PATH:/Users/ericlu/refdata}
+  path: ${LOCAL_REFDATA_PATH:/Users/ericlu/refdata}
+  pathArchive: ${LOCAL_REFDATA_ARCHIVE_PATH:/Users/ericlu/refdata/archive}

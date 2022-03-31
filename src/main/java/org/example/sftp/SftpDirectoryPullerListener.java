@@ -1,6 +1,7 @@
 package org.example.sftp;
 
 import com.github.drapostolos.rdp4j.*;
+import com.jcraft.jsch.SftpException;
 import lombok.extern.slf4j.Slf4j;
 import org.example.fileservice.RemoteRefDataFileService;
 
@@ -11,18 +12,27 @@ public class SftpDirectoryPullerListener implements DirectoryListener, IoErrorLi
 
     private RemoteRefDataFileService remoteRefDataFileService;
 
-    public SftpDirectoryPullerListener(final RemoteRefDataFileService remoteRefDataFileService) {
+    private SftpFileFilter sftpFileFilter;
+
+    public SftpDirectoryPullerListener(final RemoteRefDataFileService remoteRefDataFileService,
+                                       final SftpFileFilter unixSftpFIleFilter) {
         this.remoteRefDataFileService = remoteRefDataFileService;
+        this.sftpFileFilter = unixSftpFIleFilter;
     }
 
-            @Override
+    @Override
     public void fileAdded(FileAddedEvent event) {
-        log.info("new file  {} added on sftp server ", event.getFileElement());
         try {
-            remoteRefDataFileService.transportRemoteRefDataFile(event.getFileElement());
+            if (sftpFileFilter.filterRemoreDataFile(event.getFileElement())) {
+                log.info("new file  {} added on sftp server ", event.getFileElement());
+                remoteRefDataFileService.processRemoteRefDataFile(event.getFileElement());
+            }
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (SftpException e) {
+            e.printStackTrace();
         }
+
     }
 
     //        @Override
@@ -40,8 +50,7 @@ public class SftpDirectoryPullerListener implements DirectoryListener, IoErrorLi
 
     //      @Override
     public void ioErrorRaised(IoErrorRaisedEvent event) {
-        System.out.println("I/O error raised!");
-        event.getIoException().printStackTrace();
+        log.error("I/O error raised!");
     }
 
     //      @Override

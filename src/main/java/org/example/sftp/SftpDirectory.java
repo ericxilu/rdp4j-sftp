@@ -63,7 +63,7 @@ public class SftpDirectory implements PolledDirectory{
             throw new IOException(e);
         }
 
-        log.info("remote sftp server list of files {}", result);
+        log.debug("remote sftp server list of files {}", result);
         return result;
     }
 }
