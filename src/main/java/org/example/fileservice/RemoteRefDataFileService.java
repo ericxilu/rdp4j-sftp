@@ -1,8 +1,11 @@
 package org.example.fileservice;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.drapostolos.rdp4j.spi.FileElement;
 import com.jcraft.jsch.SftpException;
 import lombok.extern.slf4j.Slf4j;
+import org.example.client.FileAuditServiceClient;
+import org.example.model.FileAudit;
 import org.example.sftp.SftpClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -24,18 +27,23 @@ public class RemoteRefDataFileService {
 
     private FileDecompressor fileDecompressor;
 
+    private FileAuditServiceClient fileAuditServiceClient;
+
     public RemoteRefDataFileService(final LocalRefDataFileService localRefDataFileService,
                                     final SftpClient sftpClient,
-                                    final TarGzFileDecompressor tarGzFileDecompressor) {
+                                    final TarGzFileDecompressor tarGzFileDecompressor,
+                                    final FileAuditServiceClient fileAuditServiceClient) {
         this.localRefDataFileService = localRefDataFileService;
         this.sftpClient = sftpClient;
         this.fileDecompressor = tarGzFileDecompressor;
+        this.fileAuditServiceClient = fileAuditServiceClient;
     }
 
     public void processRemoteRefDataFile (FileElement file) throws SftpException, IOException {
         if (transportRemoteRefDataFile(file)) {
             decompressRefDataFile(file);
             archiveRefDataFile(file);
+            refreshRefData(file);
         }
     }
 
@@ -61,10 +69,17 @@ public class RemoteRefDataFileService {
 
     private void decompressRefDataFile (FileElement file) throws IOException {
         fileDecompressor.decompress(Paths.get(getLocalFileFullPath(file.getName())), Paths.get(localRefDataFileService.getLocalRefDataPath()));
+        log.info("ref data file {} decompressed", file);
     }
 
     private void archiveRefDataFile (FileElement file) throws IOException {
         localRefDataFileService.archiveRefDataFile(file.getName());
+        log.info("ref data file {} archived", file);
+    }
+
+    private void refreshRefData (FileElement file) throws JsonProcessingException {
+        fileAuditServiceClient.addFileAudit(new FileAudit(file.getName()));
+        log.info("ref data file {} refreshed", file);
     }
 
     private String getRemoteFileFullPath(String remoteFileName) {

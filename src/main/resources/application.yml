@@ -7,3 +7,7 @@ sftp:
 localRefData:
   path: ${LOCAL_REFDATA_PATH:/Users/ericlu/refdata}
   pathArchive: ${LOCAL_REFDATA_ARCHIVE_PATH:/Users/ericlu/refdata/archive}
+
+url:
+  fileAuditController:
+    addFileAudit: http://localhost:8080/api/addfileaudit

@@ -3,13 +3,13 @@ package org.example.restendpoint;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.data.FileAuditService;
+import org.example.model.FileAudit;
 import org.example.sftp.SftpDirectoryPuller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +41,21 @@ public class FileAuditController {
         }
     }
 
+    @PostMapping(value = "/addfileaudit", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<FileAudit> addFileAudit(@RequestBody FileAudit fileAudit){
+        log.info("adding file audit");
+
+        try{
+            Map<String, Object> params = new HashMap<>();
+            params.put("fileName",fileAudit.getFileName());
+            fileAuditService.addFileAudits(params);
+            return new ResponseEntity<>(new FileAudit(fileAudit.getFileName()), HttpStatus.OK);
+
+        }finally {
+            log.info("getFileAudit completed");
+
+        }
+    }
     @GetMapping("/stopSftpPuller")
     public ResponseEntity<String> stopFtpPuller(){
         log.info("stopping ftp puller");
