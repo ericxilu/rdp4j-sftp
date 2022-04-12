@@ -1,5 +1,5 @@
 sftp:
-  host: localhost
+  host: 192.168.1.123
   path: ${SFTP_PATH:ftpserver}
   username: ${SFTP_USERNAME:ericlu}
   password: ${SFTP_PASSWORD:1943L1944t$&@}
